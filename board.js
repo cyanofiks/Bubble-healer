@@ -511,8 +511,8 @@ new Board();
 function createBoard(){
 
     gameBoard.create(
-        width,
-        height
+        gameWidth,
+        gameHeight
     );
 
 }
