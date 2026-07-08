@@ -634,7 +634,4 @@ function resetBoard() {
 
 window.gameBoard = gameBoard;
 
-console.log(
-    "Board ready:",
-    gameBoard
-);
+
