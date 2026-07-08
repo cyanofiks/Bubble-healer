@@ -48,12 +48,14 @@ class Bubble {
 
     draw(ctx, time) {
 
-        const yy =
-            this.y +
-            Math.sin(
-                time * 2 +
-                this.floatOffset
-            ) * 2;
+     this.renderY =
+    this.y +
+    Math.sin(
+        time * 2 +
+        this.floatOffset
+    ) * 2;
+
+const yy = this.renderY;
 
         let color1 = "#ffffff";
         let color2 = "#dff5ff";
