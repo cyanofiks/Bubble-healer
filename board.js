@@ -249,13 +249,15 @@ class Board {
 
         this.cell = 48;
 
-        this.cols = Math.floor(
-            usableWidth / this.cell
-        );
+    this.cols = Math.max(
+    8,
+    Math.floor(usableWidth / this.cell)
+);
 
-        this.rows = Math.floor(
-            usableHeight / this.cell
-        );
+this.rows = Math.max(
+    12,
+    Math.floor(usableHeight / this.cell)
+);
 
         this.cell = Math.min(
 
