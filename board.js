@@ -3,126 +3,145 @@
    board.js
 ========================================================== */
 
-const board = {
+class Bubble {
 
-    bubbles:[],
+    constructor(row, col, x, y, radius) {
 
-    cols:0,
+        this.row = row;
+        this.col = col;
 
-    rows:0,
+        this.x = x;
+        this.y = y;
 
-    size:0,
+        this.radius = radius;
 
-    margin:12,
+        this.state = "normal";
 
-    floatTime:0
+        // normal
+        // protected
+        // virus
+        // dead
 
-};
+        this.timer = 0;
 
+        this.floatOffset = Math.random() * Math.PI * 2;
 
+        this.scale = 1;
 
-class Bubble{
+        this.highlight = 0;
 
-    constructor(row,col,x,y,r){
+        this.infected = false;
 
-        this.row=row;
-
-        this.col=col;
-
-        this.x=x;
-
-        this.y=y;
-
-        this.radius=r;
-
-        this.state="normal";
-
-        this.timer=0;
-
-        this.offset=Math.random()*Math.PI*2;
+        this.protectedUntil = 0;
 
     }
 
-    update(dt){
+    update(dt, time) {
 
-        this.timer+=dt;
+        this.timer += dt;
+
+        this.scale += (1 - this.scale) * 0.15;
+
+        this.highlight += dt;
 
     }
 
-    draw(ctx){
+    draw(ctx, time) {
 
-        let y=
-        this.y+
-        Math.sin(
-            board.floatTime+
-            this.offset
-        )*2;
+        const yy =
+            this.y +
+            Math.sin(
+                time * 2 +
+                this.floatOffset
+            ) * 2;
+
+        let color1 = "#ffffff";
+        let color2 = "#dff5ff";
+        let color3 = "#74c9ff";
+
+        if (this.state === "protected") {
+
+            color1 = "#fffde7";
+            color2 = "#fff176";
+            color3 = "#fbc02d";
+
+        }
+
+        if (this.state === "virus") {
+
+            color1 = "#d7ffd7";
+            color2 = "#77ff77";
+            color3 = "#00aa22";
+
+        }
+
+        if (this.state === "dead") {
+
+            color1 = "#ffb8b8";
+            color2 = "#ff5555";
+            color3 = "#7b0000";
+
+        }
 
         // shadow
 
         ctx.beginPath();
 
-        ctx.fillStyle="rgba(0,0,0,.18)";
+        ctx.fillStyle = "rgba(0,0,0,.18)";
 
         ctx.arc(
-            this.x+2,
-            y+4,
+
+            this.x + 2,
+
+            yy + 4,
+
             this.radius,
+
             0,
-            Math.PI*2
+
+            Math.PI * 2
+
         );
 
         ctx.fill();
 
         // bubble
 
-        const g=
-        ctx.createRadialGradient(
+        const g = ctx.createRadialGradient(
 
-            this.x-this.radius*.4,
+            this.x - this.radius * .35,
 
-            y-this.radius*.5,
+            yy - this.radius * .45,
 
-            this.radius*.2,
+            this.radius * .15,
 
             this.x,
 
-            y,
+            yy,
 
             this.radius
 
         );
 
-        g.addColorStop(
-            0,
-            "#ffffff"
-        );
-
-        g.addColorStop(
-            .3,
-            "#dff7ff"
-        );
-
-        g.addColorStop(
-            1,
-            "#6bc4ff"
-        );
+        g.addColorStop(0, color1);
+        g.addColorStop(.45, color2);
+        g.addColorStop(1, color3);
 
         ctx.beginPath();
 
-        ctx.fillStyle=g;
+        ctx.fillStyle = g;
 
         ctx.arc(
 
             this.x,
 
-            y,
+            yy,
 
-            this.radius,
+            this.radius * this.scale,
 
             0,
 
-            Math.PI*2
+            Math.PI * 2
 
         );
 
@@ -132,116 +151,71 @@ class Bubble{
 
         ctx.beginPath();
 
-        ctx.fillStyle="rgba(255,255,255,.75)";
+        ctx.fillStyle = "rgba(255,255,255,.75)";
 
         ctx.arc(
 
-            this.x-this.radius*.35,
+            this.x - this.radius * .35,
 
-            y-this.radius*.35,
+            yy - this.radius * .35,
 
-            this.radius*.22,
+            this.radius * .22,
 
             0,
 
-            Math.PI*2
+            Math.PI * 2
 
         );
 
         ctx.fill();
 
-    }
+        if (this.state === "virus") {
 
-}
+            ctx.fillStyle = "#003300";
 
+            ctx.font = `${this.radius}px Arial`;
 
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-function createBoard(){
+            ctx.fillText(
+                "☣",
+                this.x,
+                yy + 1
+            );
 
-    board.bubbles=[];
+        }
 
-    const usableWidth=
-    width-30;
+        if (this.state === "protected") {
 
-    const usableHeight=
-    height-30;
+            ctx.fillStyle = "#b00000";
 
-    board.cols=
-    Math.floor(
-        usableWidth/48
-    );
+            ctx.font = `${this.radius}px Arial`;
 
-    board.rows=
-    Math.floor(
-        usableHeight/48
-    );
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-    board.size=
-    Math.min(
+            ctx.fillText(
+                "🛡",
+                this.x,
+                yy + 1
+            );
 
-        usableWidth/
-        board.cols,
+        }
 
-        usableHeight/
-        board.rows
+        if (this.state === "dead") {
 
-    );
+            ctx.fillStyle = "#ffffff";
 
-    const r=
-    board.size*.42;
+            ctx.font = `${this.radius}px Arial`;
 
-    const startX=
-    (width-
-    board.cols*
-    board.size)/2;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-    const startY=
-    (height-
-    board.rows*
-    board.size)/2;
-
-    for(
-
-        let row=0;
-
-        row<board.rows;
-
-        row++
-
-    ){
-
-        for(
-
-            let col=0;
-
-            col<board.cols;
-
-            col++
-
-        ){
-
-            board.bubbles.push(
-
-                new Bubble(
-
-                    row,
-
-                    col,
-
-                    startX+
-                    col*
-                    board.size+
-                    board.size/2,
-
-                    startY+
-                    row*
-                    board.size+
-                    board.size/2,
-
-                    r
-
-                )
-
+            ctx.fillText(
+                "✖",
+                this.x,
+                yy
             );
 
         }
@@ -250,25 +224,304 @@ function createBoard(){
 
 }
 
+class Board {
+
+    constructor() {
+
+        this.bubbles = [];
+
+        this.rows = 0;
+
+        this.cols = 0;
+
+        this.cell = 0;
+
+        this.time = 0;
+
+    }
+
+    create(width, height) {
+
+        this.bubbles = [];
+
+        const usableWidth = width - 20;
+        const usableHeight = height - 20;
+
+        this.cell = 48;
+
+        this.cols = Math.floor(
+            usableWidth / this.cell
+        );
+
+        this.rows = Math.floor(
+            usableHeight / this.cell
+        );
+
+        this.cell = Math.min(
+
+            usableWidth / this.cols,
+
+            usableHeight / this.rows
+
+        );
+
+        const radius =
+            this.cell * .42;
+
+        const offsetX =
+            (width -
+                this.cols * this.cell) / 2;
+
+        const offsetY =
+            (height -
+                this.rows * this.cell) / 2;
+
+        for (let row = 0; row < this.rows; row++) {
+
+            for (let col = 0; col < this.cols; col++) {
+
+                const x =
+                    offsetX +
+                    col * this.cell +
+                    this.cell / 2;
+
+                const y =
+                    offsetY +
+                    row * this.cell +
+                    this.cell / 2;
+
+                this.bubbles.push(
+
+                    new Bubble(
+
+                        row,
+
+                        col,
+
+                        x,
+
+                        y,
+
+                        radius
+
+                    )
+
+                );
+
+            }
+
+        }
+
+    }        update(dt) {
+
+            this.time += dt;
+
+            const now = performance.now();
+
+            for (const bubble of this.bubbles) {
+
+                bubble.update(dt, this.time);
+
+                // istek zaštite
+
+                if (
+                    bubble.state === "protected" &&
+                    bubble.protectedUntil > 0 &&
+                    now > bubble.protectedUntil
+                ) {
+
+                    bubble.state = "normal";
+                    bubble.protectedUntil = 0;
+
+                }
+
+            }
+
+        }
+
+        draw(ctx) {
+
+            for (const bubble of this.bubbles) {
+
+                bubble.draw(
+                    ctx,
+                    this.time
+                );
+
+            }
+
+        }
+
+        getBubbleAt(x, y) {
+
+            for (const bubble of this.bubbles) {
+
+                const dx =
+                    bubble.x - x;
+
+                const dy =
+                    bubble.y - y;
+
+                const dist =
+                    Math.sqrt(
+                        dx * dx +
+                        dy * dy
+                    );
+
+                if (dist <= bubble.radius) {
+
+                    return bubble;
+
+                }
+
+            }
+
+            return null;
+
+        }
+
+        getNeighbours(bubble) {
+
+            const result = [];
+
+            const dirs = [
+
+                [-1,-1],
+                [-1,0],
+                [-1,1],
+
+                [0,-1],
+                [0,1],
+
+                [1,-1],
+                [1,0],
+                [1,1]
+
+            ];
+
+            for (const dir of dirs) {
+
+                const row =
+                    bubble.row + dir[0];
+
+                const col =
+                    bubble.col + dir[1];
+
+                const n =
+                    this.getBubble(
+                        row,
+                        col
+                    );
+
+                if (n)
+                    result.push(n);
+
+            }
+
+            return result;
+
+        }
+
+        getBubble(row, col) {
+
+            if (
+                row < 0 ||
+                col < 0 ||
+                row >= this.rows ||
+                col >= this.cols
+            )
+                return null;
+
+            return this.bubbles[
+                row * this.cols + col
+            ];
+
+        }
+
+        protect(bubble) {
+
+            if (!bubble) return;
+
+            if (bubble.state !== "normal")
+                return;
+
+            bubble.state = "protected";
+
+            // štit traje 10 sekundi
+
+            bubble.protectedUntil =
+                performance.now() + 10000;
+
+            bubble.scale = 1.25;
+
+        }
+
+        infect(bubble) {
+
+            if (!bubble) return;
+
+            if (
+                bubble.state === "protected" ||
+                bubble.state === "dead"
+            )
+                return;
+
+            bubble.state = "virus";
+
+            bubble.scale = 1.2;
+
+            bubble.infected = true;
+
+        }
+
+        kill(bubble) {
+
+            if (!bubble) return;
+
+            bubble.state = "dead";
+
+            bubble.scale = .9;
+
+            bubble.infected = false;
+
+        }
+
+        clear() {
+
+            for (const bubble of this.bubbles) {
+
+                bubble.state = "normal";
+
+                bubble.protectedUntil = 0;
+
+                bubble.infected = false;
+
+            }
+
+        }
+
+    }
+
+
+const gameBoard =
+new Board();
+
+
+
+function createBoard(){
+
+    gameBoard.create(
+        width,
+        height
+    );
+
+}
+
 
 
 function updateBoard(dt){
 
-    board.floatTime+=dt*2;
-
-    for(
-
-        const b
-
-        of
-
-        board.bubbles
-
-    ){
-
-        b.update(dt);
-
-    }
+    gameBoard.update(dt);
 
 }
 
@@ -276,18 +529,122 @@ function updateBoard(dt){
 
 function drawBoard(ctx){
 
-    for(
+    gameBoard.draw(ctx);
 
-        const b
+}/* ==========================================================
+   Bubble Virus
+   board.js (3/3)
+========================================================== */
 
-        of
+// ----------------------
+// Brush helper
+// ----------------------
 
-        board.bubbles
+function protectAt(x, y, radius = 35) {
 
-    ){
+    const r2 = radius * radius;
 
-        b.draw(ctx);
+    for (const bubble of gameBoard.bubbles) {
+
+        if (bubble.state !== "normal")
+            continue;
+
+        const dx = bubble.x - x;
+        const dy = bubble.y - y;
+
+        if ((dx * dx + dy * dy) <= r2) {
+
+            gameBoard.protect(bubble);
+
+        }
 
     }
 
 }
+
+// ----------------------
+// Random bubble
+// ----------------------
+
+function getRandomNormalBubble() {
+
+    const free =
+        gameBoard.bubbles.filter(
+            b => b.state === "normal"
+        );
+
+    if (free.length === 0)
+        return null;
+
+    return free[
+        Math.floor(
+            Math.random() * free.length
+        )
+    ];
+
+}
+
+// ----------------------
+// Virus helpers
+// ----------------------
+
+function getVirusBubbles() {
+
+    return gameBoard.bubbles.filter(
+        b => b.state === "virus"
+    );
+
+}
+
+function getProtectedCount() {
+
+    return gameBoard.bubbles.filter(
+        b => b.state === "protected"
+    ).length;
+
+}
+
+function getDeadCount() {
+
+    return gameBoard.bubbles.filter(
+        b => b.state === "dead"
+    ).length;
+
+}
+
+function getVirusCount() {
+
+    return gameBoard.bubbles.filter(
+        b => b.state === "virus"
+    ).length;
+
+}
+
+function getNormalCount() {
+
+    return gameBoard.bubbles.filter(
+        b => b.state === "normal"
+    ).length;
+
+}
+
+// ----------------------
+// Reset board
+// ----------------------
+
+function resetBoard() {
+
+    gameBoard.clear();
+
+}
+
+// ----------------------
+// Debug
+// ----------------------
+
+window.gameBoard = gameBoard;
+
+console.log(
+    "Board ready:",
+    gameBoard
+);
