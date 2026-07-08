@@ -123,6 +123,9 @@ function gameLoop(timestamp) {
     elapsedTime += deltaTime;
 
     update(deltaTime);
+   if(gameBoard){
+    console.log(gameBoard.bubbles.length);
+}
 
     draw();
 
@@ -191,5 +194,6 @@ const GAME = {
 // --------------------------------------------------
 
 initGame();
+console.log("Game started");
 
 requestAnimationFrame(gameLoop);
