@@ -242,79 +242,67 @@ class Board {
 
     create(width, height) {
 
-        this.bubbles = [];
+    this.bubbles = [];
 
-        const usableWidth = width - 20;
-        const usableHeight = height - 20;
+    // Veći rubovi da se kugle ne režu
+    const padding = Math.max(24, Math.min(width, height) * 0.04);
 
-        this.cell = 48;
+    const usableWidth = width - padding * 2;
+    const usableHeight = height - padding * 2;
+
+    // Dinamična veličina ćelije
+    let targetCell;
+
+    if (width < 500) {
+        targetCell = 42;
+    } else if (width < 900) {
+        targetCell = 46;
+    } else {
+        targetCell = 52;
+    }
 
     this.cols = Math.max(
-    8,
-    Math.floor(usableWidth / this.cell)
-);
+        8,
+        Math.floor(usableWidth / targetCell)
+    );
 
-this.rows = Math.max(
-    12,
-    Math.floor(usableHeight / this.cell)
-);
+    this.rows = Math.max(
+        12,
+        Math.floor(usableHeight / targetCell)
+    );
 
-        this.cell = Math.min(
+    this.cell = Math.min(
+        usableWidth / this.cols,
+        usableHeight / this.rows
+    );
 
-            usableWidth / this.cols,
+    const radius = this.cell * 0.44;
 
-            usableHeight / this.rows
+    const offsetX =
+        (width - this.cols * this.cell) / 2;
 
-        );
+    const offsetY =
+        (height - this.rows * this.cell) / 2;
 
-        const radius =
-            this.cell * .42;
+    for (let row = 0; row < this.rows; row++) {
 
-        const offsetX =
-            (width -
-                this.cols * this.cell) / 2;
+        for (let col = 0; col < this.cols; col++) {
 
-        const offsetY =
-            (height -
-                this.rows * this.cell) / 2;
-
-        for (let row = 0; row < this.rows; row++) {
-
-            for (let col = 0; col < this.cols; col++) {
-
-                const x =
-                    offsetX +
-                    col * this.cell +
-                    this.cell / 2;
-
-                const y =
-                    offsetY +
-                    row * this.cell +
-                    this.cell / 2;
-
-                this.bubbles.push(
-
-                    new Bubble(
-
-                        row,
-
-                        col,
-
-                        x,
-
-                        y,
-
-                        radius
-
-                    )
-
-                );
-
-            }
+            this.bubbles.push(
+                new Bubble(
+                    row,
+                    col,
+                    offsetX + col * this.cell + this.cell / 2,
+                    offsetY + row * this.cell + this.cell / 2,
+                    radius
+                )
+            );
 
         }
 
-    }        update(dt) {
+    }
+
+}      update(dt) {
 
             this.time += dt;
 
