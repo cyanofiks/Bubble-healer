@@ -121,45 +121,38 @@ function updatePlayer(dt){
 
 function protectBrush(){
 
-    const r2 =
-        PLAYER.brushRadius *
-        PLAYER.brushRadius;
+    const bubble =
+        gameBoard.getBubbleAt(
+            PLAYER.pointerX,
+            PLAYER.pointerY
+        );
 
-    PLAYER.protectedCount = 0;
+    if(!bubble)
+        return;
 
-    for(const bubble of gameBoard.bubbles){
+    if(bubble.state!=="normal")
+        return;
 
-        if(bubble.state!=="normal")
-            continue;
+    bubble.state="protected";
 
-        const dx =
-            bubble.x-
-            PLAYER.pointerX;
+    bubble.protectedUntil=
+        performance.now()+
+        PLAYER.shieldDuration*1000;
 
-        const dy =
-            bubble.y-
-            PLAYER.pointerY;
+    bubble.scale=1.25;
 
-        if(
-            dx*dx+
-            dy*dy
-            <=
-            r2
-        ){
+    GAME.protected=
+        getProtectedCount();
 
-            bubble.state="protected";
+    if(navigator.vibrate){
 
-            bubble.protectedUntil=
-                performance.now()+
-                PLAYER.shieldDuration*1000;
-
-            bubble.scale=1.20;
-
-            PLAYER.protectedCount++;
-
-        }
+        navigator.vibrate(8);
 
     }
+
+    playShield();
+
+}
 
     GAME.protected =
         getProtectedCount();
