@@ -352,7 +352,7 @@ class Board {
                     bubble.x - x;
 
                 const dy =
-                    bubble.y - y;
+    (bubble.renderY ?? bubble.y) - y;
 
                 const dist =
                     Math.sqrt(
