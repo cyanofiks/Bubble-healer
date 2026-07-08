@@ -193,7 +193,10 @@ const GAME = {
 // Start
 // --------------------------------------------------
 
-initGame();
-console.log("Game started");
+window.addEventListener("load", () => {
 
-requestAnimationFrame(gameLoop);
+    initGame();
+
+    requestAnimationFrame(gameLoop);
+
+});
