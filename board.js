@@ -358,7 +358,7 @@ class Board {
                         dy * dy
                     );
 
-                if (dist <= bubble.radius) {
+               if (dist <= bubble.radius * 1.25) {
 
                     return bubble;
 
