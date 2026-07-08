@@ -15,17 +15,15 @@ const PLAYER = {
     energyMax: 100,
     energy: 100,
 
-    energyDrain: 30,      // u sekundi
-    energyRecharge: 18,   // u sekundi
+    energyDrain: 30,
+    energyRecharge: 18,
 
-    shieldDuration: 10,
-
-    protectedCount: 0
+    shieldDuration: 10
 
 };
 
 // ----------------------------------------------------
-// Input
+// INPUT
 // ----------------------------------------------------
 
 canvas.addEventListener("pointerdown", e => {
@@ -58,91 +56,77 @@ canvas.addEventListener("pointerleave", () => {
 
 function updatePointer(e){
 
-    const rect =
-        canvas.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
 
-    PLAYER.pointerX =
-        e.clientX - rect.left;
-
-    PLAYER.pointerY =
-        e.clientY - rect.top;
+    PLAYER.pointerX = e.clientX - rect.left;
+    PLAYER.pointerY = e.clientY - rect.top;
 
 }
 
 // ----------------------------------------------------
-// Update
+// UPDATE
 // ----------------------------------------------------
 
 function updatePlayer(dt){
 
     if(PLAYER.drawing){
 
-        PLAYER.energy -=
-            PLAYER.energyDrain * dt;
+        PLAYER.energy -= PLAYER.energyDrain * dt;
 
-        PLAYER.energy =
-            clamp(
-                PLAYER.energy,
-                0,
-                PLAYER.energyMax
-            );
+        PLAYER.energy = clamp(
+            PLAYER.energy,
+            0,
+            PLAYER.energyMax
+        );
 
-        if(PLAYER.energy>0){
+        if(PLAYER.energy > 0){
 
             protectBrush();
 
         }
 
-    }
-    else{
+    }else{
 
-        PLAYER.energy +=
-            PLAYER.energyRecharge * dt;
+        PLAYER.energy += PLAYER.energyRecharge * dt;
 
-        PLAYER.energy =
-            clamp(
-                PLAYER.energy,
-                0,
-                PLAYER.energyMax
-            );
+        PLAYER.energy = clamp(
+            PLAYER.energy,
+            0,
+            PLAYER.energyMax
+        );
 
     }
 
     updateProtectedTimers();
 
-    GAME.energy =
-        Math.round(
-            PLAYER.energy
-        );
+    GAME.energy = Math.round(PLAYER.energy);
 
 }
 
 // ----------------------------------------------------
+// PROTECT
+// ----------------------------------------------------
 
 function protectBrush(){
 
-    const bubble =
-        gameBoard.getBubbleAt(
-            PLAYER.pointerX,
-            PLAYER.pointerY
-        );
+    const bubble = gameBoard.getBubbleAt(
+        PLAYER.pointerX,
+        PLAYER.pointerY
+    );
 
-    if(!bubble)
-        return;
+    if(!bubble) return;
 
-    if(bubble.state!=="normal")
-        return;
+    if(bubble.state !== "normal") return;
 
-    bubble.state="protected";
+    bubble.state = "protected";
 
-    bubble.protectedUntil=
-        performance.now()+
-        PLAYER.shieldDuration*1000;
+    bubble.protectedUntil =
+        performance.now() +
+        PLAYER.shieldDuration * 1000;
 
-    bubble.scale=1.25;
+    bubble.scale = 1.25;
 
-    GAME.protected=
-        getProtectedCount();
+    GAME.protected = getProtectedCount();
 
     if(navigator.vibrate){
 
@@ -150,32 +134,31 @@ function protectBrush(){
 
     }
 
-    playShield();
+    if(typeof playShield === "function"){
 
-}
+        playShield();
 
-    GAME.protected =
-        getProtectedCount();
+    }
 
 }
 
 // ----------------------------------------------------
+// SHIELD TIMER
+// ----------------------------------------------------
 
 function updateProtectedTimers(){
 
-    const now=
-        performance.now();
+    const now = performance.now();
 
     for(const bubble of gameBoard.bubbles){
 
         if(
-            bubble.state==="protected" &&
-            bubble.protectedUntil<now
+            bubble.state === "protected" &&
+            bubble.protectedUntil < now
         ){
 
-            bubble.state="normal";
-
-            bubble.protectedUntil=0;
+            bubble.state = "normal";
+            bubble.protectedUntil = 0;
 
         }
 
@@ -184,41 +167,35 @@ function updateProtectedTimers(){
 }
 
 // ----------------------------------------------------
+// HELPERS
+// ----------------------------------------------------
 
 function playerCanProtect(){
 
-    return PLAYER.energy>1;
+    return PLAYER.energy > 1;
 
 }
-
-// ----------------------------------------------------
 
 function refillEnergy(){
 
-    PLAYER.energy=
-        PLAYER.energyMax;
+    PLAYER.energy = PLAYER.energyMax;
 
 }
-
-// ----------------------------------------------------
 
 function emptyEnergy(){
 
-    PLAYER.energy=0;
+    PLAYER.energy = 0;
 
 }
-
-// ----------------------------------------------------
 
 function playerHit(){
 
     GAME.lives--;
 
-    if(GAME.lives<=0){
+    if(GAME.lives <= 0){
 
-        GAME.lives=0;
-
-        GAME.paused=true;
+        GAME.lives = 0;
+        GAME.paused = true;
 
     }
 
